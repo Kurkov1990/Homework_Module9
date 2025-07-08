@@ -2,17 +2,22 @@ package homework.task5;
 
 public class MyHashMap<K, V> {
 
-    private final Node<K, V>[] buckets;
+    private Node<K, V>[] buckets;
     private int size;
+    private int capacity;
+    private final double loadFactor;
+
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
+        this.capacity = 16;
+        this.loadFactor = 0.75;
         this.buckets = (Node<K, V>[]) new Node[16];
         size = 0;
     }
 
     private int getBucketIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % buckets.length);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     public void put(K key, V value) {
@@ -31,6 +36,10 @@ public class MyHashMap<K, V> {
         newNode.setNext(buckets[index]);
         buckets[index] = newNode;
         size++;
+
+        if ((double) size / capacity > loadFactor) {
+            resize();
+        }
     }
 
     public V get(K key) {
@@ -70,7 +79,7 @@ public class MyHashMap<K, V> {
     }
 
     public void clear() {
-        for (int i = 0; i < buckets.length; i++) {
+        for (int i = 0; i < capacity; i++) {
             buckets[i] = null;
         }
         size = 0;
@@ -78,6 +87,28 @@ public class MyHashMap<K, V> {
 
     public int size() {
         return size;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        int newCapacity = capacity * 2;
+        Node<K, V>[] newBuckets = (Node<K, V>[]) new Node[newCapacity];
+
+        for (int i = 0; i < capacity; i++) {
+            Node<K, V> current = buckets[i];
+            while (current != null) {
+                Node<K, V> next = current.getNext();
+
+                int newIndex = (current.getKey() == null) ? 0 : Math.abs(current.getKey().hashCode() % newCapacity);
+                current.setNext(newBuckets[newIndex]);
+                newBuckets[newIndex] = current;
+
+                current = next;
+            }
+        }
+
+        this.buckets = newBuckets;
+        this.capacity = newCapacity;
     }
 
     public static void main(String[] args) {

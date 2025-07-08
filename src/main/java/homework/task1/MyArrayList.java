@@ -6,7 +6,7 @@ public class MyArrayList<T> {
     private int size;
 
     public MyArrayList() {
-        data = new Object[2];
+        data = new Object[10];
         size = 0;
     }
 
@@ -44,7 +44,7 @@ public class MyArrayList<T> {
 
     private void ensureCapacity() {
         if (size == data.length) {
-            int newCapacity = data.length + 5;
+            int newCapacity = data.length * 2;
             Object[] newData = new Object[newCapacity];
             System.arraycopy(data, 0, newData, 0, data.length);
             data = newData;
